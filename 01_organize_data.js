@@ -209,13 +209,11 @@ console.log(
 // 10. How many individuals own more than one pet?
 // Expected : 1
 
-const peopleWithMultiplePets = people.filter(
-  (person) => person.pets.length > 1
-);
+const multiplePetsPeople = people.filter((person) => person.pets.length > 1);
 
 console.log(
   "Number of people with more than 1 pet :",
-  peopleWithMultiplePets.length
+  multiplePetsPeople.length
 );
 
 // *****************************************************************************
@@ -257,11 +255,73 @@ console.log(
 // *****************************************************************************
 // 15. How many individuals have more than two hobbies?
 // Expected : 3
-const peopleWithMultipleHobbies = people.filter(
+const multipleHobbiesPeople = people.filter(
   (person) => person.hobbies.length > 1
 );
 
 console.log(
   "Number of people with more than two hobbies :",
-  peopleWithMultipleHobbies.length
+  multipleHobbiesPeople.length
 );
+
+// *****************************************************************************
+// 16. How many individuals share at least one hobby with Ramesh?
+// Expected : 2
+
+const rameshHobbies = people.find((person) => person.name === "Ramesh").hobbies;
+
+const similarHobbiesPeople = people.filter((person) =>
+  person.hobbies.some(
+    (hobby) => rameshHobbies.includes(hobby) && person.name !== "Ramesh"
+  )
+);
+
+console.log(
+  "Number of people with some similar hobbies with Ramesh :",
+  similarHobbiesPeople.length
+);
+
+// *****************************************************************************
+// 17. Which pet is the youngest, and what is its name?
+// Expected : rabbit, snowy
+
+const youngestPet = people
+  .flatMap((person) => person.pets)
+  .reduce((youngestPet, pet) => {
+    if (pet.age < youngestPet.age || !youngestPet.age) {
+      return pet;
+    }
+    return youngestPet;
+  });
+
+console.log(
+  "Youngest pet is",
+  youngestPet.species,
+  "and its name is",
+  youngestPet.name
+);
+
+// *****************************************************************************
+// 18. What types of books are mentioned as interests, and who reads them?
+// Expected :
+
+// *****************************************************************************
+// 19. How many individuals live in cities starting with the letter "B"?
+// Expected : 1
+
+const peopleInBCities = people.filter((person) => person.city.at(0) === "B");
+
+console.log(
+  "Number of people living in cities starting with letter 'B' :",
+  peopleInBCities.length
+);
+
+// *****************************************************************************
+// 20. Which individuals do not own any pets?
+// Expected : []
+
+const peopleWithoutPets = people
+  .filter((person) => person.pets.length === 0)
+  .map((person) => person.name);
+  
+console.log("People with no pets :", peopleWithoutPets);
