@@ -2,7 +2,8 @@ const person1 = {
   name: "Rahul",
   age: 30,
   city: "Pune",
-  hobbies: ["chess", "gardening"],
+  // hobbies: ["chess", "gardening"],
+  hobbies: { chess: null, gardening: null },
   education: ["Computer Science"],
   isEmployed: true,
   // profession: "Software Engineer",
@@ -23,7 +24,8 @@ const person2 = {
   name: "Ananya",
   age: 30,
   city: "Bangalore",
-  hobbies: ["cooking"],
+  // hobbies: ["cooking"],
+  hobbies: { cooking: "Italian recipes" },
   education: ["Computer Science", "graphic design"],
   isEmployed: false,
   //profession : null;
@@ -44,7 +46,8 @@ const person3 = {
   name: "Ramesh",
   age: 45,
   city: "Jaipur",
-  hobbies: ["gardening", "reading"],
+  // hobbies: ["gardening", "reading"],
+  hobbies: { gardening: "rose", reading: "historical fiction" },
   education: [],
   isEmployed: true,
   // profession: "Business Owner",
@@ -73,7 +76,8 @@ const person4 = {
   name: "Kavya",
   age: 28,
   city: "Chennai",
-  hobbies: ["reading", "watching sci-fi shows"],
+  // hobbies: ["reading", "watching sci-fi shows"],
+  hobbies: { reading: "modern fantasy novels", watching: "sci-fi shows" },
   education: [],
   isEmployed: false,
   // profession: "dancer",
@@ -159,7 +163,7 @@ const removeDuplicates = (array) => {
   return array.reduce(addIfUnique, []);
 };
 
-const allHobbies = people.flatMap((person) => person.hobbies);
+const allHobbies = people.flatMap((person) => Object.keys(person.hobbies));
 const sharedHobbies = removeDuplicates(allHobbies);
 
 console.log("Number of shared hobbies :", sharedHobbies.length);
@@ -218,7 +222,7 @@ console.log(
 
 // *****************************************************************************
 // 11. Which pets are associated with specific favorite activities?
-// Expected :
+// Expected
 
 // *****************************************************************************
 // 12. What are the names of all animals that belong to people who live in Bangalore or Chennai?
@@ -250,13 +254,13 @@ console.log(
 
 // *****************************************************************************
 //14. What is the most common type of pet among the group?
-// Expected :
+// Expected
 
 // *****************************************************************************
 // 15. How many individuals have more than two hobbies?
 // Expected : 3
 const multipleHobbiesPeople = people.filter(
-  (person) => person.hobbies.length > 1
+  (person) => Object.keys(person.hobbies).length > 1
 );
 
 console.log(
@@ -271,8 +275,9 @@ console.log(
 const rameshHobbies = people.find((person) => person.name === "Ramesh").hobbies;
 
 const similarHobbiesPeople = people.filter((person) =>
-  person.hobbies.some(
-    (hobby) => rameshHobbies.includes(hobby) && person.name !== "Ramesh"
+  Object.keys(person.hobbies).some(
+    (hobby) =>
+      Object.keys(rameshHobbies).includes(hobby) && person.name !== "Ramesh"
   )
 );
 
@@ -303,7 +308,14 @@ console.log(
 
 // *****************************************************************************
 // 18. What types of books are mentioned as interests, and who reads them?
-// Expected :
+// Expected : [ "historical fiction", "modern fantasy novels" ]
+
+const typesOfBooks = people
+  .map((person) => [person.name, person.hobbies])
+  .filter(([name, hobbies]) => hobbies.reading)
+  .map(([name, hobbies]) => ({ name: name, bookType: hobbies.reading }));
+
+console.log("Types of books people read :", typesOfBooks);
 
 // *****************************************************************************
 // 19. How many individuals live in cities starting with the letter "B"?
@@ -323,5 +335,5 @@ console.log(
 const peopleWithoutPets = people
   .filter((person) => person.pets.length === 0)
   .map((person) => person.name);
-  
+
 console.log("People with no pets :", peopleWithoutPets);
