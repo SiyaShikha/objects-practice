@@ -112,28 +112,28 @@ console.log("Number of car owners :", carOwners(people).length);
 
 // 3. How many pets are fully vaccinated?
 const vaccinatedPets = (people) =>
-  people.flatMap((person) => person.pets).filter((pet) => pet.isVaccinated);
+  people.flatMap(({ pets }) => pets).filter((pet) => pet.isVaccinated);
 
 console.log("Number of vaccinated pets :", vaccinatedPets(people).length);
 
 // 4. What are the names of all the pets, and what type of animal is each?
 const petsInformation = (people) =>
   people
-    .flatMap((person) => person.pets)
-    .map((pet) => ({ name: pet.name, specis: pet.species }));
+    .flatMap(({ pets }) => pets)
+    .map(({ name, species }) => ({ name: name, species: species }));
 
 console.log("Names and types of all pets :", petsInformation(people));
 
 // 5. Which cities do the individuals live in?
-const cities = (people) => people.map((person) => person.city);
+const cities = (people) => people.map(({ city }) => city);
 
 console.log("Cities of people :", cities(people));
 
 // 6. How many hobbies are shared across the group? What are they?
 const sharedHobbies = (people) =>
   people
-    .flatMap((person) => person.hobbies)
-    .map((hobby) => hobby.name)
+    .flatMap(({ hobbies }) => hobbies)
+    .map(({ name: hobbyName }) => hobbyName)
     .reduce((uniqueElements, element) => {
       uniqueElements[element] = true;
       return uniqueElements;
@@ -148,7 +148,7 @@ console.log("Shared hobbies are :", Object.keys(sharedHobbies(people)));
 
 // 7. How many pets belong to people who are currently unemployed?
 const petsOfUnemployedPeople = (people) =>
-  people.filter((person) => !person.isEmployed).map((person) => person.pets);
+  people.filter((person) => !person.isEmployed).map(({ pets }) => pets);
 
 console.log(
   "Number of pets belonging to unemployed people :",
@@ -157,18 +157,19 @@ console.log(
 
 // 8. What is the average age of the individuals mentioned in the passage?
 const averageAge = (people) =>
-  people.reduce((sum, person) => sum + person.age, 0) / people.length;
+  people.reduce((sum, { age }) => sum + age, 0) / people.length;
 
 console.log("Average age of people :", averageAge(people));
 
 // 9. How many individuals have studied computer science, and how many of them have pets?
 const compSciPeople = (people) =>
-  people.filter((person) => person.education.includes("Computer Science"));
+  people.filter(({ education }) => education.includes("Computer Science"));
 
 const compSciPeopleWithPets = (people) =>
-  compSciPeople(people).filter((person) => person.pets.length > 0);
+  compSciPeople(people).filter(({ pets }) => pets.length > 0);
 
 console.log("Number of people studied CS :", compSciPeople(people).length);
+
 console.log(
   "Number of CS people who have pets :",
   compSciPeopleWithPets(people).length
@@ -176,7 +177,7 @@ console.log(
 
 // 10. How many individuals own more than one pet?
 const multiplePetsPeople = (people) =>
-  people.filter((person) => person.pets.length > 1);
+  people.filter(({ pets }) => pets.length > 1);
 
 console.log(
   "Number of people with more than 1 pet :",
@@ -186,7 +187,7 @@ console.log(
 // 11. Which pets are associated with specific favorite activities?
 const petsWithSpecificActivities = (people) =>
   people
-    .flatMap((person) => person.pets)
+    .flatMap(({ pets }) => pets)
     .filter((pet) => pet.favouriteActivity.length > 0)
     .map((pet) => ({
       name: pet.name,
@@ -201,11 +202,9 @@ console.log(
 // 12. What are the names of all animals that belong to people who live in Bangalore or Chennai?
 const petsOfPeopleFromBangaloreOrChennai = (people) =>
   people
-    .filter(
-      (person) => person.city === "Bangalore" || person.city === "Chennai"
-    )
-    .flatMap((person) => person.pets)
-    .map((pet) => pet.name);
+    .filter(({ city }) => city === "Bangalore" || city === "Chennai")
+    .flatMap(({ pets }) => pets)
+    .map(({ name: petName }) => petName);
 
 console.log(
   "Names of pets of people from Bangalore or Chennai :",
@@ -215,8 +214,8 @@ console.log(
 // 13. How many vaccinated pets belong to people who do not own a car?
 const vaccinatedPetsOfNonCarOwners = (people) =>
   people
-    .filter((person) => !person.ownsCar)
-    .flatMap((person) => person.pets)
+    .filter(({ ownsCar }) => !ownsCar)
+    .flatMap(({ pets }) => pets)
     .filter((pet) => pet.isVaccinated);
 
 console.log(
@@ -226,13 +225,25 @@ console.log(
 
 //14. What is the most common type of pet among the group?
 const mostCommonPet = (people) =>
-  people.flatMap((person) => person.pets).map((pet) => pet.species);
+  Object.entries(
+    people
+      .flatMap(({ pets }) => pets)
+      .map((pet) => pet.species)
+      .reduce((count, pet) => {
+        count[pet] = (count[pet] || 0) + 1;
+        return count;
+      }, {})
+  ).reduce(
+    ([_, maxCount], [pet, count]) =>
+      count > maxCount ? [pet, count] : [_, maxCount],
+    ["", -Infinity]
+  );
 
 console.log("Most common pet is :", mostCommonPet(people));
 
 // 15. How many individuals have more than two hobbies?
 const multipleHobbiesPeople = (people) =>
-  people.filter((person) => Object.keys(person.hobbies).length > 1);
+  people.filter(({ hobbies }) => Object.keys(hobbies).length > 1);
 
 console.log(
   "Number of people with more than two hobbies :",
@@ -242,13 +253,13 @@ console.log(
 // 16. How many individuals share at least one hobby with Ramesh?
 const rameshHobbies = (people) =>
   people
-    .find((person) => person.name === "Ramesh")
-    .hobbies.map((hobby) => hobby.name);
+    .find(({ name }) => name === "Ramesh")
+    .hobbies.map(({ name: hobbyName }) => hobbyName);
 
 const similarHobbiesPeople = (people) =>
-  people.filter((person) =>
-    person.hobbies
-      .map((hobby) => hobby.name)
+  people.filter(({ hobbies }) =>
+    hobbies
+      .map(({ name }) => name)
       .some((hobby) => rameshHobbies(people).includes(hobby))
   );
 
@@ -260,7 +271,7 @@ console.log(
 // 17. Which pet is the youngest, and what is its name?
 const youngestPet = (people) =>
   people
-    .flatMap((person) => person.pets)
+    .flatMap(({ pets }) => pets)
     .reduce((youngestPet, pet) => {
       return pet.age < youngestPet.age ? pet : youngestPet;
     });
@@ -275,18 +286,20 @@ console.log(
 // 18. What types of books are mentioned as interests, and who reads them?
 const typesOfBooks = (people) =>
   people
-    .map((person) => [person.name, person.hobbies])
-    .filter(([a, hobbies]) => hobbies.some((h) => h.name === "reading"))
+    .map(({ name, hobbies }) => [name, hobbies])
+    .filter(([a, hobbies]) => hobbies.some(({ name }) => name === "reading"))
     .map(([name, hobbies]) => ({
       name: name,
-      bookType: hobbies.find((h) => h.name === "reading").specifics.join(""),
+      bookType: hobbies
+        .find(({ name }) => name === "reading")
+        .specifics.join(""),
     }));
 
 console.log("Types of books people read :", typesOfBooks(people));
 
 // 19. How many individuals live in cities starting with the letter "B"?
 const peopleInBCities = (people) =>
-  people.filter((person) => person.city.at(0) === "B");
+  people.filter(({ city }) => city.at(0) === "B");
 
 console.log(
   "Number of people living in cities starting with letter 'B' :",
@@ -295,8 +308,6 @@ console.log(
 
 // 20. Which individuals do not own any pets?
 const peopleWithoutPets = (people) =>
-  people
-    .filter((person) => person.pets.length === 0)
-    .map((person) => person.name);
+  people.filter((person) => person.pets.length === 0).map(({ name }) => name);
 
 console.log("People with no pets :", peopleWithoutPets(people));
