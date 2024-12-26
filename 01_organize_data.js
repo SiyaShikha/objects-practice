@@ -224,15 +224,17 @@ console.log(
 );
 
 //14. What is the most common type of pet among the group?
+const countOccurrences = (strings) =>
+  strings.reduce((frequencies, string) => {
+    frequencies[string] = (frequencies[string] || 0) + 1;
+    return frequencies;
+  }, {});
+
 const mostCommonPet = (people) =>
   Object.entries(
-    people
-      .flatMap(({ pets }) => pets)
-      .map((pet) => pet.species)
-      .reduce((count, pet) => {
-        count[pet] = (count[pet] || 0) + 1;
-        return count;
-      }, {})
+    countOccurrences(
+      people.flatMap(({ pets }) => pets).map((pet) => pet.species)
+    )
   ).reduce(
     ([_, maxCount], [pet, count]) =>
       count > maxCount ? [pet, count] : [_, maxCount],
